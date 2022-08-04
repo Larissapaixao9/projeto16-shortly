@@ -9,7 +9,7 @@ app.use(express.json())
 app.use(cors())
 app.use(userouters)
 
-app.get('https://projetoshortly.herokuapp.com/home',(req,res)=>{
+app.get('/home',(req,res)=>{
     res.send('funcionando')
 })
 

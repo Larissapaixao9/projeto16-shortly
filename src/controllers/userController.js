@@ -1,5 +1,5 @@
 import express from "express";
-import connection from "../database";
+import connection from "../database.js";
 export async function logup(req,res){
     const { name, email, password, confirmPassword } = req.body;
 try {
