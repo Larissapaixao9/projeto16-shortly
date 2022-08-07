@@ -91,3 +91,40 @@ export async function signin(req,res){
         return res.send(error).status(400)
     }
 }
+
+export async function getUserData(req,res){
+    const { authorization } = req.headers;
+    const token = authorization?.replace('Bearer ', '');
+
+    
+    console.log(token)
+    if(token===null){
+        return res.send('não existe token').status(401)
+    }
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err,user)=>{
+        if(err){
+            return res.status(403).send('usuario não tem acesso a essa pagina')
+        }
+        console.log(req.body)
+    })
+
+    const search_for_user = await connection.query(`SELECT user_id FROM sessions WHERE token=$1`,[token])
+
+    if(search_for_user.rowCount===0){
+        return res.sendStatus(401);
+    }
+
+    const { user_id } = search_for_user.rows[0]
+    console.log(user_id);
+
+    const get_all_user_infos = await connection.query(`SELECT users.id, users.name, SUM(count) AS "visitCount" FROM users JOIN urls2 ON users.id=urls2.user_id WHERE users.id=$1 GROUP BY users.id`,[user_id]);
+
+    const user_urls_infos = await connection.query(`SELECT urls2.id, "shortUrl", url, count AS "visitCount" FROM urls2 WHERE user_id=$1`,[user_id])
+
+     console.log(get_all_user_infos.rows[0])
+     console.log(user_urls_infos.rows)
+
+     
+     const result = {...get_all_user_infos.rows[0], "shortUrl":user_urls_infos.rows}
+    return res.status(200).send(result);
+}

@@ -11,3 +11,21 @@
 --   "shortUrl" TEXT NOT NULL,
 --   url TEXT NOT NULL
 -- )
+
+-- SELECT * FROM urls2;
+-- SELECT * FROM users ORDER BY ID DESC LIMIT 1;
+
+-- CREATE TABLE urls2(
+-- 	id SERIAL PRIMARY KEY,
+-- 	url TEXT NOT NULL,   
+-- 	"shortUrl" TEXT NOT NULL,
+-- 	user_id INT,
+-- 	user_token TEXT NOT NULL
+-- )
+-- ALTER TABLE urls2 ADD COLUMN count INT DEFAULT 0;
+
+-- CREATE TABLE sessions(
+-- 	id SERIAL PRIMARY KEY,
+-- 	user_id INT NOT NULL,   
+-- 	token TEXT NOT NULL
+-- )

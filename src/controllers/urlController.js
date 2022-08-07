@@ -59,3 +59,55 @@ export async function getUrlByParams (req,res){
 //     "email":"e@e.com",
 //     "password":"e"
 // }
+
+export async function redirectUrl(req,res){
+    const short_url = req.params.shortUrl;
+    if(!short_url){
+        return res.sendStatus(404);
+    }
+    console.log(short_url);
+
+    const get_url_from_shortUrl = await connection.query(`SELECT url FROM urls2 WHERE "shortUrl"=$1`,[short_url]);
+
+    if(get_url_from_shortUrl.rowCount===0){
+        return res.status(404).send('a url encurtada nao existe')
+    }
+
+
+    if(get_url_from_shortUrl.rowCount>0){
+       console.log('url encurtada existe')
+    }
+    
+    const url_tobe_redirected=get_url_from_shortUrl.rows[0].url;
+    console.log(url_tobe_redirected);
+    
+    await connection.query(`UPDATE urls2 SET count=count+1 WHERE url=$1`,[url_tobe_redirected])
+    return res.redirect(url_tobe_redirected)
+}
+
+export async function deleteShortUrl(req,res){
+    const id = parseInt(req.params.id);
+    console.log(id);
+
+    if(!id){
+        return res.sendStatus(400)
+    }
+
+    const user_from_sessions = await connection.query('SELECT * FROM sessions ORDER BY ID DESC LIMIT 1'
+    )
+    console.log(user_from_sessions.rows[0])
+
+    const get_url_shotendUrl = await connection.query(`SELECT user_id FROM urls2 WHERE id=$1`,[id]);
+
+
+    if(user_from_sessions.rows[0].user_id!=get_url_shotendUrl.rows[0].user_id){
+        console.log(user_from_sessions.rows[0].user_id)
+        console.log(get_url_shotendUrl.rows[0].user_id)
+        return res.status(401).send('a url não é do usuario')
+    }
+    else{
+       // connection.query(`DELETE `)
+       connection.query(`DELETE FROM urls2 WHERE id=$1`,[id])
+    }
+     return res.sendStatus(201)
+}
