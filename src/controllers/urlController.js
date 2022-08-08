@@ -52,7 +52,10 @@ export async function getUrlByParams (req,res){
 
     const get_url_shotendUrl = await connection.query(`SELECT id,url, "shortUrl" FROM urls2 WHERE id=$1`,[id]);
     console.log(get_url_shotendUrl)
-    res.send(get_url_shotendUrl.rows[0])
+    if(get_url_shotendUrl.rowCount===0){
+        return res.status(404).send('url não encontrada')
+    }
+    return res.send(get_url_shotendUrl.rows[0])
 }
 
 // {
@@ -99,6 +102,9 @@ export async function deleteShortUrl(req,res){
 
     const get_url_shotendUrl = await connection.query(`SELECT user_id FROM urls2 WHERE id=$1`,[id]);
 
+    if(get_url_shotendUrl.rowCount===0){
+        return res.status(404).send('url não encontrada')
+    }
 
     if(user_from_sessions.rows[0].user_id!=get_url_shotendUrl.rows[0].user_id){
         console.log(user_from_sessions.rows[0].user_id)
@@ -107,7 +113,7 @@ export async function deleteShortUrl(req,res){
     }
     else{
        // connection.query(`DELETE `)
-       connection.query(`DELETE FROM urls2 WHERE id=$1`,[id])
+       await connection.query(`DELETE FROM urls2 WHERE id=$1`,[id])
     }
      return res.sendStatus(201)
 }

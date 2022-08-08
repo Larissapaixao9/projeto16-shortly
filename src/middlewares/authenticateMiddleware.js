@@ -15,7 +15,7 @@ export default function authenticateToken(req,res,next){
     }
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err,user)=>{
         if(err){
-            return res.status(403).send('usuario não tem acesso a essa pagina')
+            return res.status(401).send('usuario não tem acesso a essa pagina')
         }
         console.log(req.body)
         
